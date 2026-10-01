@@ -56,6 +56,29 @@ const assert = require('node:assert/strict');
     await page.getByRole('button', { name: 'Test Sesi Çal', exact: true }).click();
     await page.getByRole('button', { name: 'Devam', exact: true }).click();
     report.asr = await page.evaluate(() => window.electron.ipcRenderer.invoke('tr:request', '/tr/asr/status'));
+    if (process.env.TR_ASR_TEST === '1') {
+      if (!report.asr.ready) {
+        await page.getByRole('button', {name:'Türkçe Konuşma Modelini İndir',exact:true}).click();
+        const deadline=Date.now()+1200000;
+        do {
+          report.asr=await page.evaluate(() => window.electron.ipcRenderer.invoke('tr:request','/tr/asr/status'));
+          if(report.asr.state==='error') throw new Error(report.asr.message);
+          if(report.asr.ready) break;
+          await new Promise(resolve=>setTimeout(resolve,2000));
+        } while(Date.now()<deadline);
+        assert.equal(report.asr.ready,true,'ASR download and initialization must finish before transcription');
+      }
+      const fixture = await fs.readFile(path.resolve(process.env.TR_QA_ASR_WAV || '../Open-LLM-VTuber-TR/.build/qa-data/turkce-asr.wav'));
+      report.asrTranscript = await page.evaluate(async (base64) => {
+        const status=await window.electron.ipcRenderer.invoke('tr:status');
+        const bytes=Uint8Array.from(atob(base64),c=>c.charCodeAt(0));
+        const form=new FormData();form.append('file',new Blob([bytes],{type:'audio/wav'}),'turkce-test.wav');
+        const response=await fetch(status.endpoint+'/asr',{method:'POST',body:form});
+        if(!response.ok) throw new Error('Installed ASR failed: '+response.status+' '+await response.text());
+        return response.json();
+      },fixture.toString('base64'));
+      assert.match(report.asrTranscript.text.toLocaleLowerCase('tr-TR'),/türkçe konuşma tanıma/);
+    }
     await page.getByRole('button', { name: 'Devam', exact: true }).click();
     report.providers = await page.evaluate(() => window.electron.ipcRenderer.invoke('tr:request', '/tr/providers'));
     await capture('llm.png');
@@ -71,7 +94,7 @@ const assert = require('node:assert/strict');
     await page.getByRole('button', { name: 'Karakterimle Konuş', exact: true }).click();
     await page.locator('.tr-gate').waitFor({state:'hidden', timeout:150000});
     await page.locator('canvas').first().waitFor({ timeout: 30000 });
-    await page.waitForFunction(() => document.body.innerText.includes('Bağlı'), { timeout: 30000 });
+    await page.waitForFunction(() => document.body.innerText.includes('Bağlı'), null, { timeout: 30000 });
     report.connected = true;
     await page.waitForFunction(() => window.getLAppAdapter?.().getModel()?._state === 22, null, {timeout:60000});
     report.modelLoaded = true;
