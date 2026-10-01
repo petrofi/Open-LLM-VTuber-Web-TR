@@ -53,25 +53,30 @@ const ToggleButton = memo(({ isCollapsed, onToggle }: ToggleButtonProps) => (
 
 ToggleButton.displayName = 'ToggleButton';
 
-const ActionButtons = memo(({ micOn, onMicToggle, onInterrupt }: ActionButtonsProps) => (
-  <HStack gap={2}>
-    <IconButton
-      bg={micOn ? 'green.500' : 'red.500'}
-      {...footerStyles.footer.actionButton}
-      onClick={onMicToggle}
-    >
-      {micOn ? <BsMicFill /> : <BsMicMuteFill />}
-    </IconButton>
-    <IconButton
-      aria-label="Raise hand"
-      bg="yellow.500"
-      {...footerStyles.footer.actionButton}
-      onClick={onInterrupt}
-    >
-      <IoHandRightSharp size="24" />
-    </IconButton>
-  </HStack>
-));
+const ActionButtons = memo(({ micOn, onMicToggle, onInterrupt }: ActionButtonsProps) => {
+  const { t } = useTranslation();
+  return (
+    <HStack gap={2}>
+      <IconButton
+        bg={micOn ? 'green.500' : 'red.500'}
+        {...footerStyles.footer.actionButton}
+        aria-label={t('accessibility.microphone')}
+        aria-pressed={micOn}
+        onClick={onMicToggle}
+      >
+        {micOn ? <BsMicFill /> : <BsMicMuteFill />}
+      </IconButton>
+      <IconButton
+        aria-label={t('accessibility.interrupt')}
+        bg="yellow.500"
+        {...footerStyles.footer.actionButton}
+        onClick={onInterrupt}
+      >
+        <IoHandRightSharp size="24" />
+      </IconButton>
+    </HStack>
+  );
+});
 
 ActionButtons.displayName = 'ActionButtons';
 
@@ -88,7 +93,7 @@ const MessageInput = memo(({
     <InputGroup flex={1}>
       <Box position="relative" width="100%">
         <IconButton
-          aria-label="Attach file"
+          aria-label={t('accessibility.attach')}
           variant="ghost"
           {...footerStyles.footer.attachButton}
         >

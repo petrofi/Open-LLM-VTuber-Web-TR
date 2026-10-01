@@ -7,8 +7,6 @@ const getAppHeight = () => {
   return isElectron ? 'calc(100vh - 30px)' : '100vh';
 };
 
-
-
 export const layoutStyles = {
   appContainer: {
     width: '100vw',

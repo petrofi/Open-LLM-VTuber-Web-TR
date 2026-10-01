@@ -108,7 +108,7 @@ export function VADProvider({ children }: { children: React.ReactNode }) {
   // Refs for VAD instance and state
   const vadRef = useRef<MicVAD | null>(null);
   const previousTriggeredProbabilityRef = useRef(0);
-  const previousAiStateRef = useRef<string>('idle');
+  const previousAiStateRef = useRef<'waiting' | 'idle' | 'interrupted' | 'loading' | 'listening' | 'thinking-speaking'>('idle');
 
   // Persistent state management
   const [micOn, setMicOn] = useLocalStorage('micOn', DEFAULT_VAD_STATE.micOn);
@@ -144,7 +144,7 @@ export function VADProvider({ children }: { children: React.ReactNode }) {
   // Refs for callback stability
   const interruptRef = useRef(interrupt);
   const sendAudioPartitionRef = useRef(sendAudioPartition);
-  const aiStateRef = useRef<string>(aiState);
+  const aiStateRef = useRef<typeof aiState>(aiState);
   const setSubtitleTextRef = useRef(setSubtitleText);
   const setAiStateRef = useRef(setAiState);
 
@@ -273,12 +273,14 @@ export function VADProvider({ children }: { children: React.ReactNode }) {
   const initVAD = async () => {
     const newVAD = await MicVAD.new({
       model: "v5",
-      preSpeechPadFrames: 20,
+      startOnLoad: false,
+      getStream: () => navigator.mediaDevices.getUserMedia({ audio: { deviceId: localStorage.getItem("tr-microphone") ? { exact: localStorage.getItem("tr-microphone")! } : undefined, echoCancellation: true, noiseSuppression: true } }),
+      preSpeechPadMs: 640,
       positiveSpeechThreshold: settings.positiveSpeechThreshold / 100,
       negativeSpeechThreshold: settings.negativeSpeechThreshold / 100,
-      redemptionFrames: settings.redemptionFrames,
-      baseAssetPath: './libs/',
-      onnxWASMBasePath: './libs/',
+      redemptionMs: settings.redemptionFrames * 32,
+      baseAssetPath: new URL('./libs/', document.baseURI).href,
+      onnxWASMBasePath: new URL('./libs/', document.baseURI).href,
       onSpeechStart: handleSpeechStart,
       onSpeechRealStart: handleSpeechRealStart,
       onFrameProcessed: handleFrameProcessed,
@@ -287,7 +289,7 @@ export function VADProvider({ children }: { children: React.ReactNode }) {
     });
 
     vadRef.current = newVAD;
-    newVAD.start();
+    await newVAD.start();
   };
 
   /**
@@ -300,7 +302,7 @@ export function VADProvider({ children }: { children: React.ReactNode }) {
         await initVAD();
       } else {
         console.log('Starting VAD');
-        vadRef.current.start();
+        await vadRef.current.start();
       }
       setMicOn(true);
     } catch (error) {

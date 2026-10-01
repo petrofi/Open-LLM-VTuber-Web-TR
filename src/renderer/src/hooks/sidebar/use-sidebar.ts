@@ -2,7 +2,7 @@ import { useDisclosure } from '@chakra-ui/react';
 import { useWebSocket } from '@/context/websocket-context';
 import { useInterrupt } from '@/components/canvas/live2d';
 import { useChatHistory } from '@/context/chat-history-context';
-import { useMode, ModeType } from '@/context/mode-context';
+import { useMode } from '@/context/mode-context';
 
 export const useSidebar = () => {
   const disclosure = useDisclosure();

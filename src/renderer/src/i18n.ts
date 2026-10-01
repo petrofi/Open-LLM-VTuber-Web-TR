@@ -6,6 +6,7 @@ import LanguageDetector from "i18next-browser-languagedetector";
 // Import translation resources
 import enTranslation from "./locales/en/translation.json";
 import zhTranslation from "./locales/zh/translation.json";
+import trTranslation from "./locales/tr-TR/translation.json";
 
 // Configure i18next instance
 i18n
@@ -16,7 +17,7 @@ i18n
   // Initialize i18next
   .init({
     // Default language when detection fails
-    fallbackLng: "en",
+    fallbackLng: "tr-TR",
     // Debug mode for development
     debug: process.env.NODE_ENV === "development",
     // Namespaces configuration
@@ -24,6 +25,7 @@ i18n
     ns: ["translation"],
     // Resources containing translations
     resources: {
+      "tr-TR": { translation: trTranslation },
       en: {
         translation: enTranslation,
       },
@@ -34,7 +36,7 @@ i18n
     // Language detection options
     detection: {
       // Order and from where user language should be detected
-      order: ["localStorage", "navigator"],
+      order: ["localStorage"],
       // Cache user language detection
       caches: ["localStorage"],
       // HTML attribute with which to set language

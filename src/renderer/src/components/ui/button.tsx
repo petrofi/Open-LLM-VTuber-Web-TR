@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary -- Upstream Chakra button loading fallback. */
 import type { ButtonProps as ChakraButtonProps } from '@chakra-ui/react';
 import {
   AbsoluteCenter,

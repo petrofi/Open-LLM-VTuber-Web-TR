@@ -55,8 +55,11 @@ export class WindowManager {
 
   createWindow(options: Electron.BrowserWindowConstructorOptions): BrowserWindow {
     this.window = new BrowserWindow({
-      width: 900,
-      height: 670,
+      width: 1100,
+      height: 740,
+      minWidth: 800,
+      minHeight: 600,
+      title: "Open-LLM-VTuber TR",
       show: false,
       transparent: true,
       backgroundColor: '#ffffff',
@@ -70,13 +73,15 @@ export class WindowManager {
         preload: join(__dirname, '../preload/index.js'),
         sandbox: false,
         contextIsolation: true,
-        nodeIntegration: true,
+        nodeIntegration: false,
       },
       hasShadow: false,
       paintWhenInitiallyHidden: true,
       ...options,
     });
 
+    this.window.webContents.on('will-navigate', (event) => event.preventDefault());
+    this.window.webContents.session.setPermissionRequestHandler((_contents, permission, callback) => callback(permission === 'media'));
     this.setupWindowEvents();
     this.loadContent();
 
@@ -121,7 +126,7 @@ export class WindowManager {
     });
 
     this.window.webContents.setWindowOpenHandler((details) => {
-      shell.openExternal(details.url);
+      if (/^https?:\/\//i.test(details.url)) shell.openExternal(details.url);
       return { action: 'deny' };
     });
   }

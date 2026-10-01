@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { useMode } from '@/context/mode-context';
+
 interface Position {
   x: number
   y: number

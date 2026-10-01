@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useRef, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import * as LAppDefine from '@cubismsdksamples/lappdefine';
 import { useAiState } from '@/context/ai-state-context';
 import { useSubtitle } from '@/context/subtitle-context';
 import { useChatHistory } from '@/context/chat-history-context';
@@ -11,7 +12,6 @@ import { toaster } from '@/components/ui/toaster';
 import { useWebSocket } from '@/context/websocket-context';
 import { DisplayText } from '@/services/websocket-service';
 import { useLive2DExpression } from '@/hooks/canvas/use-live2d-expression';
-import * as LAppDefine from '../../../WebSDK/src/lappdefine';
 
 // Simple type alias for Live2D model
 type Live2DModel = any;

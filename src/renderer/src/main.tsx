@@ -1,7 +1,8 @@
 import { createRoot } from 'react-dom/client';
 import './index.css';
+import { LAppAdapter } from '@cubismsdksamples/lappadapter';
 import App from './App';
-import { LAppAdapter } from '../WebSDK/src/lappadapter';
+import DesktopGate from './components/desktop/desktop-gate';
 import './i18n';
 
 const originalConsoleWarn = console.warn;
@@ -17,7 +18,7 @@ const originalConsoleError = console.error;
 const errorMessagesToIgnore = ["Warning: Failed"];
 console.error = (...args: any[]) => {
   if (typeof args[0] === 'string') {
-    const shouldIgnore = errorMessagesToIgnore.some(msg => args[0].startsWith(msg));
+    const shouldIgnore = errorMessagesToIgnore.some((msg) => args[0].startsWith(msg));
     if (shouldIgnore) {
       return; // Suppress the warning
     }
@@ -30,27 +31,25 @@ if (typeof window !== 'undefined') {
   (window as any).getLAppAdapter = () => LAppAdapter.getInstance();
 
   // Dynamically load the Live2D Core script
-  const loadLive2DCore = () => {
-    return new Promise<void>((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = './libs/live2dcubismcore.js'; // Path to the copied script
-      script.onload = () => {
-        console.log('Live2D Cubism Core loaded successfully.');
-        resolve();
-      };
-      script.onerror = (error) => {
-        console.error('Failed to load Live2D Cubism Core:', error);
-        reject(error);
-      };
-      document.head.appendChild(script);
-    });
-  };
+  const loadLive2DCore = () => new Promise<void>((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = './libs/live2dcubismcore.js'; // Path to the copied script
+    script.onload = () => {
+      console.log('Live2D Cubism Core loaded successfully.');
+      resolve();
+    };
+    script.onerror = (error) => {
+      console.error('Failed to load Live2D Cubism Core:', error);
+      reject(error);
+    };
+    document.head.appendChild(script);
+  });
 
   // Load the script and then render the app
   loadLive2DCore()
     .then(() => {
       createRoot(document.getElementById('root')!).render(
-        <App />,
+        <DesktopGate><App /></DesktopGate>,
       );
     })
     .catch((error) => {
@@ -58,7 +57,7 @@ if (typeof window !== 'undefined') {
       // Optionally render an error message to the user
       const rootElement = document.getElementById('root');
       if (rootElement) {
-        rootElement.innerHTML = 'Error loading required components. Please check the console for details.';
+        rootElement.innerHTML = 'Uygulamanın gerekli bileşenleri yüklenemedi. Kurulumu yeniden çalıştırın.';
       }
     });
 }
