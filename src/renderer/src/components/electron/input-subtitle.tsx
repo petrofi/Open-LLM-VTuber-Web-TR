@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
   LuBell, LuSend, LuMic, LuMicOff, LuHand, LuX,
 } from 'react-icons/lu';
@@ -18,6 +19,7 @@ import { inputSubtitleStyles } from './electron-style';
 import { useMode } from '@/context/mode-context';
 
 export function InputSubtitle() {
+  const { t } = useTranslation();
   const {
     inputValue,
     handleInputChange,
@@ -97,7 +99,7 @@ export function InputSubtitle() {
     >
       <Box {...inputSubtitleStyles.box}>
         <IconButton
-          aria-label="Close subtitle"
+          aria-label={t('accessibility.subtitle')}
           onClick={handleClose}
           {...inputSubtitleStyles.closeButton}
         >
@@ -128,14 +130,14 @@ export function InputSubtitle() {
 
             <Flex gap="2">
               <IconButton
-                aria-label="Toggle microphone"
+                aria-label={t('accessibility.microphone')}
                 onClick={handleMicToggle}
                 {...inputSubtitleStyles.iconButton}
               >
                 {micOn ? <LuMic size={16} /> : <LuMicOff size={16} />}
               </IconButton>
               <IconButton
-                aria-label="Interrupt"
+                aria-label={t('accessibility.interrupt')}
                 onClick={handleInterrupt}
                 {...inputSubtitleStyles.iconButton}
               >
@@ -153,7 +155,7 @@ export function InputSubtitle() {
               onKeyDown={handleKeyPress}
               onCompositionStart={handleCompositionStart}
               onCompositionEnd={handleCompositionEnd}
-              placeholder="Type your message..."
+              placeholder={t('footer.typeYourMessage')}
               {...inputSubtitleStyles.input}
             />
             <Button

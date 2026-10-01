@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { Box, IconButton } from '@chakra-ui/react';
 import {
@@ -6,6 +7,7 @@ import {
 import { layoutStyles } from '@/layout';
 
 function TitleBar(): JSX.Element {
+  const { t } = useTranslation();
   const [isMaximized, setIsMaximized] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const isMac = window.electron?.process.platform === 'darwin';
@@ -37,9 +39,9 @@ function TitleBar(): JSX.Element {
   };
 
   const getButtonLabel = () => {
-    if (isFullScreen) return 'Exit Full Screen';
-    if (isMaximized) return 'Restore';
-    return 'Maximize';
+    if (isFullScreen) return t('accessibility.fullscreen');
+    if (isMaximized) return t('accessibility.restore');
+    return t('accessibility.maximize');
   };
 
   const getButtonIcon = () => {
@@ -52,7 +54,7 @@ function TitleBar(): JSX.Element {
     return (
       <Box {...layoutStyles.macTitleBar}>
         <Box {...layoutStyles.titleBarTitle}>
-          Open LLM VTuber
+          Open-LLM-VTuber TR
         </Box>
       </Box>
     );
@@ -61,13 +63,13 @@ function TitleBar(): JSX.Element {
   return (
     <Box {...layoutStyles.windowsTitleBar}>
       <Box {...layoutStyles.titleBarTitle}>
-        Open LLM VTuber
+        Open-LLM-VTuber TR
       </Box>
       <Box {...layoutStyles.titleBarButtons}>
         <IconButton
           {...layoutStyles.titleBarButton}
           onClick={() => window.electron?.ipcRenderer.send('window-minimize')}
-          aria-label="Minimize"
+          aria-label={t('accessibility.minimize')}
         >
           <FiMinus />
         </IconButton>
@@ -81,7 +83,7 @@ function TitleBar(): JSX.Element {
         <IconButton
           {...layoutStyles.closeButton}
           onClick={() => window.electron?.ipcRenderer.send('window-close')}
-          aria-label="Close"
+          aria-label={t('accessibility.close')}
         >
           <FiX />
         </IconButton>

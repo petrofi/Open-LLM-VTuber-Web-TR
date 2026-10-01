@@ -2,6 +2,9 @@
 import {
   Tray, nativeImage, Menu, BrowserWindow, ipcMain, screen, MenuItemConstructorOptions, app,
 } from 'electron';
+import { createInstance } from 'i18next';
+import tr from '../renderer/src/locales/tr-TR/translation.json';
+import en from '../renderer/src/locales/en/translation.json';
 // @ts-expect-error
 import trayIcon from '../../resources/icon.png?asset';
 
@@ -11,6 +14,8 @@ export interface ConfigFile {
 }
 
 export class MenuManager {
+  private i18n = createInstance();
+
   private tray: Tray | null = null;
 
   private currentMode: 'window' | 'pet' = 'window';
@@ -18,6 +23,11 @@ export class MenuManager {
   private configFiles: ConfigFile[] = [];
 
   constructor(private onModeChange: (mode: 'window' | 'pet') => void) {
+    this.i18n.init({ lng: 'tr-TR', fallbackLng: 'tr-TR', resources: { 'tr-TR': { translation: tr }, en: { translation: en } }, initImmediate: false });
+    ipcMain.on('tr:language', (_event, lng) => {
+      this.i18n.changeLanguage(lng === 'en' ? 'en' : 'tr-TR');
+      this.updateTrayMenu();
+    });
     this.setupContextMenu();
   }
 
@@ -36,7 +46,7 @@ export class MenuManager {
     // console.log('Getting mode menu items, current mode:', this.currentMode)
     return [
       {
-        label: 'Window Mode',
+        label: this.i18n.t('desktopMenu.window'),
         type: 'radio' as const,
         checked: this.currentMode === 'window',
         click: () => {
@@ -44,7 +54,7 @@ export class MenuManager {
         },
       },
       {
-        label: 'Pet Mode',
+        label: this.i18n.t('desktopMenu.pet'),
         type: 'radio' as const,
         checked: this.currentMode === 'pet',
         click: () => {
@@ -65,7 +75,7 @@ export class MenuManager {
       ...(this.currentMode === 'pet'
         ? [
           {
-            label: 'Toggle Mouse Passthrough',
+            label: this.i18n.t('desktopMenu.passthrough'),
             click: () => {
               const windows = BrowserWindow.getAllWindows();
               windows.forEach((window) => {
@@ -77,7 +87,7 @@ export class MenuManager {
         ]
         : []),
       {
-        label: 'Show',
+        label: this.i18n.t('desktopMenu.show'),
         click: () => {
           const windows = BrowserWindow.getAllWindows();
           windows.forEach((window) => {
@@ -86,7 +96,7 @@ export class MenuManager {
         },
       },
       {
-        label: 'Hide',
+        label: this.i18n.t('desktopMenu.hide'),
         click: () => {
           const windows = BrowserWindow.getAllWindows();
           windows.forEach((window) => {
@@ -95,27 +105,27 @@ export class MenuManager {
         },
       },
       {
-        label: 'Exit',
+        label: this.i18n.t('desktopMenu.exit'),
         click: () => {
           app.quit();
         },
       },
     ]);
 
-    this.tray.setToolTip('Open LLM VTuber');
+    this.tray.setToolTip('Open-LLM-VTuber TR');
     this.tray.setContextMenu(contextMenu);
   }
 
   private getContextMenuItems(event: Electron.IpcMainEvent): MenuItemConstructorOptions[] {
     const template: MenuItemConstructorOptions[] = [
       {
-        label: 'Toggle Microphone',
+        label: this.i18n.t('desktopMenu.mic'),
         click: () => {
           event.sender.send('mic-toggle');
         },
       },
       {
-        label: 'Interrupt',
+        label: this.i18n.t('desktopMenu.interrupt'),
         click: () => {
           event.sender.send('interrupt');
         },
@@ -125,7 +135,7 @@ export class MenuManager {
       ...(this.currentMode === 'pet'
         ? [
           {
-            label: 'Toggle Mouse Passthrough',
+            label: this.i18n.t('desktopMenu.passthrough'),
             click: () => {
               event.sender.send('toggle-force-ignore-mouse');
             },
@@ -133,7 +143,7 @@ export class MenuManager {
         ]
         : []),
       {
-        label: 'Toggle Scrolling to Resize',
+        label: this.i18n.t('desktopMenu.resize'),
         click: () => {
           event.sender.send('toggle-scroll-to-resize');
         },
@@ -142,7 +152,7 @@ export class MenuManager {
       ...(this.currentMode === 'pet'
         ? [
           {
-            label: 'Toggle InputBox and Subtitle',
+            label: this.i18n.t('desktopMenu.subtitle'),
             click: () => {
               event.sender.send('toggle-input-subtitle');
             },
@@ -153,7 +163,7 @@ export class MenuManager {
       ...this.getModeMenuItems(),
       { type: 'separator' as const },
       {
-        label: 'Switch Character',
+        label: this.i18n.t('desktopMenu.character'),
         visible: this.currentMode === 'pet',
         submenu: this.configFiles.map((config) => ({
           label: config.name,
@@ -164,7 +174,7 @@ export class MenuManager {
       },
       { type: 'separator' as const },
       {
-        label: 'Hide',
+        label: this.i18n.t('desktopMenu.hide'),
         click: () => {
           const windows = BrowserWindow.getAllWindows();
           windows.forEach((window) => {
@@ -173,7 +183,7 @@ export class MenuManager {
         },
       },
       {
-        label: 'Exit',
+        label: this.i18n.t('desktopMenu.exit'),
         click: () => {
           app.quit();
         },

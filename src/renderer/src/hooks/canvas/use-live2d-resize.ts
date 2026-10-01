@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable no-underscore-dangle */
 import { useEffect, useCallback, RefObject, useRef } from 'react';
+import { LAppDelegate } from '@cubismsdksamples/lappdelegate';
+import { LAppLive2DManager } from '@cubismsdksamples/lapplive2dmanager';
 import { ModelInfo } from '@/context/live2d-config-context';
-import { LAppDelegate } from '../../../WebSDK/src/lappdelegate';
-import { LAppLive2DManager } from '../../../WebSDK/src/lapplive2dmanager';
 import { useMode } from '@/context/mode-context';
 
 // Constants for model scaling behavior
@@ -247,7 +247,6 @@ export const useLive2DResize = ({
       animationFrameIdRef.current = null;
     }
   }, []);
-
 
   // Monitor container size changes using ResizeObserver
   useEffect(() => {

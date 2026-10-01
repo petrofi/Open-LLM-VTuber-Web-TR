@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key -- Slider thumbs have fixed positional identity. */
 import { Slider as ChakraSlider, For, HStack } from '@chakra-ui/react';
 import * as React from 'react';
 

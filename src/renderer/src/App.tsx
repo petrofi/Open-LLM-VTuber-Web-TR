@@ -8,6 +8,7 @@ import Footer from "./components/footer/footer";
 import { AiStateProvider } from "./context/ai-state-context";
 import { Live2DConfigProvider } from "./context/live2d-config-context";
 import { SubtitleProvider } from "./context/subtitle-context";
+import { WebSocketProvider } from "./context/websocket-context";
 import { BgUrlProvider } from "./context/bgurl-context";
 import { layoutStyles } from "./layout";
 import WebSocketHandler from "./services/websocket-handler";
@@ -47,7 +48,6 @@ function AppContent(): JSX.Element {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-    
   document.documentElement.style.overflow = 'hidden';
   document.body.style.overflow = 'hidden';
   document.documentElement.style.height = '100%';
@@ -157,48 +157,48 @@ function AppContent(): JSX.Element {
 
 function App(): JSX.Element {
   return (
-    <ChakraProvider value={defaultSystem}>
-      {/* ModeProvider needs to wrap AppContent to provide mode to getGlobalStyles */}
-      <ModeProvider>
-        <AppWithGlobalStyles />
-      </ModeProvider>
-    </ChakraProvider>
+    <WebSocketProvider>
+      <ChakraProvider value={defaultSystem}>
+        {/* ModeProvider needs to wrap AppContent to provide mode to getGlobalStyles */}
+        <ModeProvider>
+          <AppWithGlobalStyles />
+        </ModeProvider>
+      </ChakraProvider>
+    </WebSocketProvider>
   );
 }
 
 // New component to access mode for global styles
 function AppWithGlobalStyles(): JSX.Element {
   return (
-    <>
-      <CameraProvider>
-        <ScreenCaptureProvider>
-          <CharacterConfigProvider>
-            <ChatHistoryProvider>
-              <AiStateProvider>
-                <ProactiveSpeakProvider>
-                  <Live2DConfigProvider>
-                    <SubtitleProvider>
-                      <VADProvider>
-                        <BgUrlProvider>
-                          <GroupProvider>
-                            <BrowserProvider>
-                              <WebSocketHandler>
-                                <Toaster />
-                                <AppContent />
-                              </WebSocketHandler>
-                            </BrowserProvider>
-                          </GroupProvider>
-                        </BgUrlProvider>
-                      </VADProvider>
-                    </SubtitleProvider>
-                  </Live2DConfigProvider>
-                </ProactiveSpeakProvider>
-              </AiStateProvider>
-            </ChatHistoryProvider>
-          </CharacterConfigProvider>
-        </ScreenCaptureProvider>
-      </CameraProvider>
-    </>
+    <CameraProvider>
+      <ScreenCaptureProvider>
+        <CharacterConfigProvider>
+          <ChatHistoryProvider>
+            <AiStateProvider>
+              <ProactiveSpeakProvider>
+                <Live2DConfigProvider>
+                  <SubtitleProvider>
+                    <VADProvider>
+                      <BgUrlProvider>
+                        <GroupProvider>
+                          <BrowserProvider>
+                            <WebSocketHandler>
+                              <Toaster />
+                              <AppContent />
+                            </WebSocketHandler>
+                          </BrowserProvider>
+                        </GroupProvider>
+                      </BgUrlProvider>
+                    </VADProvider>
+                  </SubtitleProvider>
+                </Live2DConfigProvider>
+              </ProactiveSpeakProvider>
+            </AiStateProvider>
+          </ChatHistoryProvider>
+        </CharacterConfigProvider>
+      </ScreenCaptureProvider>
+    </CameraProvider>
   );
 }
 

@@ -19,7 +19,7 @@ const createConfig = async (outDir: string) => ({
           dest: './libs/',
         },
         {
-          src: normalizePath(path.resolve(__dirname, 'node_modules/onnxruntime-web/dist/*.wasm')),
+          src: normalizePath(path.resolve(__dirname, 'node_modules/onnxruntime-web/dist/*.{wasm,mjs}')),
           dest: './libs/',
         },
         {

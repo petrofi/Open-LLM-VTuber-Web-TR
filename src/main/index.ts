@@ -1,8 +1,17 @@
 /* eslint-disable no-shadow */
 import { app, ipcMain, globalShortcut, desktopCapturer } from "electron";
 import { electronApp, optimizer } from "@electron-toolkit/utils";
+import { join } from "node:path";
 import { WindowManager } from "./window-manager";
 import { MenuManager } from "./menu-manager";
+import { DesktopRuntime } from "./desktop-runtime";
+
+app.setName("Open-LLM-VTuber TR");
+app.setPath("userData", (!app.isPackaged && process.env.TR_QA_DATA) || join(app.getPath("appData"), "Open-LLM-VTuber-TR"));
+const runtime = new DesktopRuntime();
+const hasLock = app.requestSingleInstanceLock();
+if (!hasLock) app.quit();
+app.on("second-instance", () => windowManager?.getWindow()?.show());
 
 let windowManager: WindowManager;
 let menuManager: MenuManager;
@@ -58,7 +67,7 @@ function setupIPC(): void {
   );
 
   ipcMain.handle("get-config-files", () => {
-    const configFiles = JSON.parse(localStorage.getItem("configFiles") || "[]");
+    const configFiles = [];
     menuManager.updateConfigFiles(configFiles);
     return configFiles;
   });
@@ -73,8 +82,10 @@ function setupIPC(): void {
   });
 }
 
-app.whenReady().then(() => {
-  electronApp.setAppUserModelId("com.electron");
+app.whenReady().then(async () => {
+  if (!hasLock) return;
+  await runtime.load();
+  electronApp.setAppUserModelId("community.openllmvtuber.tr");
 
   windowManager = new WindowManager();
   menuManager = new MenuManager((mode) => windowManager.setWindowMode(mode));
@@ -88,13 +99,7 @@ app.whenReady().then(() => {
   });
   menuManager.createTray();
 
-  window.on("close", (event) => {
-    if (!isQuitting) {
-      event.preventDefault();
-      window.hide();
-    }
-    return false;
-  });
+  window.on("close", () => { app.quit(); });
 
   if (process.env.NODE_ENV === "development") {
     globalShortcut.register("F12", () => {
@@ -139,8 +144,11 @@ app.on("window-all-closed", () => {
   }
 });
 
-app.on("before-quit", () => {
+app.on("before-quit", (event) => {
+  if (isQuitting) return;
+  event.preventDefault();
   isQuitting = true;
-  menuManager.destroy();
+  menuManager?.destroy();
   globalShortcut.unregisterAll();
+  runtime.stop().finally(() => app.quit());
 });

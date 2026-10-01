@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle -- Access to the upstream SDK model API. */
 import { useCallback } from 'react';
 import { ModelInfo } from '@/context/live2d-config-context';
 

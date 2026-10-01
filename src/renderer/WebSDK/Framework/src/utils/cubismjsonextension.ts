@@ -50,7 +50,8 @@ export class CubismJsonExtension {
     return map;
   }
 
-  protected static parseJsonArray(obj: Value) {
+  // TR modification: this function receives a native JSON array, not a Cubism Value.
+  protected static parseJsonArray(obj: unknown[]) {
     const arr = new JsonArray();
     Object.keys(obj).forEach((key) => {
       const convKey = Number(key);

@@ -1,9 +1,10 @@
 /* eslint-disable react/require-default-props */
 import { Box, Button, Menu } from '@chakra-ui/react';
 import {
-  FiSettings, FiClock, FiPlus, FiChevronLeft, FiUsers, FiLayers
+  FiSettings, FiClock, FiPlus, FiChevronLeft, FiUsers, FiLayers,
 } from 'react-icons/fi';
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { sidebarStyles } from './sidebar-styles';
 import SettingUI from './setting/setting-ui';
 import ChatHistoryPanel from './chat-history-panel';
@@ -49,73 +50,79 @@ const ModeMenu = memo(({ setMode, currentMode, isElectron }: {
   setMode: (mode: ModeType) => void
   currentMode: ModeType
   isElectron: boolean
-}) => (
-  <Menu.Root>
-    <Menu.Trigger as={Button} aria-label="Mode Menu" title="Change Mode">
-      <FiLayers />
-    </Menu.Trigger>
-    <Menu.Positioner>
-      <Menu.Content>
-        <Menu.RadioItemGroup value={currentMode}>
-          <Menu.RadioItem value="window" onClick={() => setMode('window')}>
-            <Menu.ItemIndicator />
-            Live Mode
-          </Menu.RadioItem>
-          <Menu.RadioItem 
-            value="pet" 
-            onClick={() => {
-              if (isElectron) {
-                setMode('pet');
-              }
-            }}
-            disabled={!isElectron}
-            title={!isElectron ? "Pet mode is only available in desktop app" : undefined}
-          >
-            <Menu.ItemIndicator />
-            Pet Mode
-          </Menu.RadioItem>
-        </Menu.RadioItemGroup>
-      </Menu.Content>
-    </Menu.Positioner>
-  </Menu.Root>
-));
+}) => {
+  const { t } = useTranslation();
+  return (
+    <Menu.Root>
+      <Menu.Trigger as={Button} aria-label={t('accessibility.mode')} title={t('accessibility.mode')}>
+        <FiLayers />
+      </Menu.Trigger>
+      <Menu.Positioner>
+        <Menu.Content>
+          <Menu.RadioItemGroup value={currentMode}>
+            <Menu.RadioItem value="window" onClick={() => setMode('window')}>
+              <Menu.ItemIndicator />
+              {t('desktopMenu.window')}
+            </Menu.RadioItem>
+            <Menu.RadioItem
+              value="pet"
+              onClick={() => {
+                if (isElectron) {
+                  setMode('pet');
+                }
+              }}
+              disabled={!isElectron}
+              title={!isElectron ? t('settings.general.petModeDesktopOnly') : undefined}
+            >
+              <Menu.ItemIndicator />
+              {t('desktopMenu.pet')}
+            </Menu.RadioItem>
+          </Menu.RadioItemGroup>
+        </Menu.Content>
+      </Menu.Positioner>
+    </Menu.Root>
+  );
+});
 
 ModeMenu.displayName = 'ModeMenu';
 
-const HeaderButtons = memo(({ onSettingsOpen, onNewHistory, setMode, currentMode, isElectron }: HeaderButtonsProps) => (
-  <Box display="flex" gap={1}>
-    <Button onClick={onSettingsOpen}>
-      <FiSettings />
-    </Button>
-
-    <GroupDrawer>
-      <Button>
-        <FiUsers />
+const HeaderButtons = memo(({ onSettingsOpen, onNewHistory, setMode, currentMode, isElectron }: HeaderButtonsProps) => {
+  const { t } = useTranslation();
+  return (
+    <Box display="flex" gap={1}>
+      <Button onClick={onSettingsOpen} aria-label={t('accessibility.settings')} title={t('accessibility.settings')}>
+        <FiSettings />
       </Button>
-    </GroupDrawer>
 
-    <HistoryDrawer>
-      <Button>
-        <FiClock />
+      <GroupDrawer>
+        <Button>
+          <FiUsers />
+        </Button>
+      </GroupDrawer>
+
+      <HistoryDrawer>
+        <Button aria-label={t('accessibility.history')} title={t('accessibility.history')}>
+          <FiClock />
+        </Button>
+      </HistoryDrawer>
+
+      <Button onClick={onNewHistory} aria-label={t('accessibility.newChat')} title={t('accessibility.newChat')}>
+        <FiPlus />
       </Button>
-    </HistoryDrawer>
 
-    <Button onClick={onNewHistory}>
-      <FiPlus />
-    </Button>
-
-    <ModeMenu setMode={setMode} currentMode={currentMode} isElectron={isElectron} />
-  </Box>
-));
+      <ModeMenu setMode={setMode} currentMode={currentMode} isElectron={isElectron} />
+    </Box>
+  );
+});
 
 HeaderButtons.displayName = 'HeaderButtons';
 
-const SidebarContent = memo(({ 
-  onSettingsOpen, 
-  onNewHistory, 
-  setMode, 
+const SidebarContent = memo(({
+  onSettingsOpen,
+  onNewHistory,
+  setMode,
   currentMode,
-  isElectron
+  isElectron,
 }: HeaderButtonsProps) => (
   <Box {...sidebarStyles.sidebar.content}>
     <Box {...sidebarStyles.sidebar.header}>

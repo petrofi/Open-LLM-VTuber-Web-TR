@@ -1,8 +1,8 @@
-import { 
-  Box, 
-  Stack, 
-  Text, 
-  Heading, 
+import {
+  Box,
+  Stack,
+  Text,
+  Heading,
   HStack,
   Icon,
 } from '@chakra-ui/react';
@@ -13,13 +13,13 @@ import { Button } from '@/components/ui/button';
 
 function About(): JSX.Element {
   const { t } = useTranslation();
-  
+
   const openExternalLink = (url: string) => {
     // Handle external link opening via electron
     window.open(url, '_blank');
   };
-  
-  const appVersion = '1.2.1';
+
+  const appVersion = '1.2.1-tr.1';
   // const appAuthor = 'Open LLM VTuber Team';
 
   return (
@@ -32,6 +32,8 @@ function About(): JSX.Element {
           {t("settings.about.version")}
         </Text>
         <Text>{appVersion}</Text>
+        <Text mt={2}>{t("settings.about.community")}</Text>
+        <Button mt={3} onClick={() => window.dispatchEvent(new Event("tr-settings-open"))}>{t("common.settings")}</Button>
       </Box>
       {/* <Box mt={1}>
         <Text fontWeight="bold" mb={0}>{t('Author')}</Text>
@@ -45,19 +47,21 @@ function About(): JSX.Element {
         <HStack mt={1} gap={2}>
           <Button
             size="sm"
-            onClick={() =>
-              openExternalLink(
-                "https://github.com/Open-LLM-VTuber/Open-LLM-VTuber-Web"
-              )
-            }
+            onClick={() => openExternalLink(
+              "https://github.com/petrofi/Open-LLM-VTuber-TR",
+            )}
           >
-            <Icon as={FaGithub} mr={2} /> {t("settings.about.github")}
+            <Icon as={FaGithub} mr={2} />
+            {' '}
+            {t("settings.about.github")}
           </Button>
           <Button
             size="sm"
-            onClick={() => openExternalLink("https://docs.llmvtuber.com")}
+            onClick={() => openExternalLink("https://github.com/petrofi/Open-LLM-VTuber-TR/tree/main/docs/TR")}
           >
-            <Icon as={FaBook} mr={2} /> {t("settings.about.documentation")}
+            <Icon as={FaBook} mr={2} />
+            {' '}
+            {t("settings.about.documentation")}
           </Button>
         </HStack>
       </Box>
@@ -71,7 +75,12 @@ function About(): JSX.Element {
         <Text fontWeight="bold" mb={0}>
           {t("settings.about.copyright")}
         </Text>
-        <Text>© {new Date().getFullYear()} Open LLM VTuber Team</Text>
+        <Text>
+          ©
+          {new Date().getFullYear()}
+          {' '}
+          Open LLM VTuber Team
+        </Text>
       </Box>
     </Stack>
   );

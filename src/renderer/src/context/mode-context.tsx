@@ -1,3 +1,4 @@
+/* eslint-disable react/function-component-definition, react/jsx-no-constructed-context-values -- Preserve upstream context component shape. */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toaster } from '../components/ui/toaster';
 
@@ -84,4 +85,4 @@ export const useMode = (): ModeContextType => {
     throw new Error('useMode must be used within a ModeProvider');
   }
   return context;
-}; 
+};

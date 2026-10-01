@@ -184,6 +184,8 @@ export class LAppLive2DManager {
    * サンプルアプリケーションではモデルセットの切り替えを行う。
    */
   public changeScene(index: number): void {
+    // TR: React can request the manager before backend model configuration arrives.
+    if (!Number.isInteger(index) || index < 0 || index >= LAppDefine.ModelDirSize) return;
     this._sceneIndex = index;
     if (LAppDefine.DebugLogEnable) {
       LAppPal.printMessage(`[APP]model index: ${this._sceneIndex}`);

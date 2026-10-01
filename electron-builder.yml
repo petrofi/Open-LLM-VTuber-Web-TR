@@ -1,57 +1,44 @@
-appId: com.electron.app
-productName: open-llm-vtuber-electron
+appId: community.openllmvtuber.tr
+productName: Open-LLM-VTuber TR
+copyright: Copyright © Open-LLM-VTuber contributors; TR community modifications
 directories:
   buildResources: resources
   output: release/${version}
 files:
-  - 'dist/**/*'
-  - 'out/**/*'
-  - 'resources/**/*'
-  - '!**/.vscode/*'
-  - '!src/*'
-  - '!electron.vite.config.{js,ts,mjs,cjs}'
-  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
-  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
-  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
-asarUnpack:
-  - resources/**
+  - out/**/*
+  - resources/icon.*
+  - LICENSE
+  - '!**/*.map'
+extraResources:
+  - from: .runtime/backend
+    to: backend
+  - from: .runtime/python
+    to: python
+  - from: .runtime/licenses
+    to: licenses
 win:
-  executableName: open-llm-vtuber-electron
+  target:
+    - target: nsis
+      arch: [x64]
+  executableName: Open-LLM-VTuber-TR
   icon: resources/icon.ico
+  signAndEditExecutable: true
 nsis:
-  artifactName: ${name}-${version}-setup.${ext}
-  shortcutName: ${productName}
-  uninstallDisplayName: ${productName}
+  artifactName: Open-LLM-VTuber-TR-v${version}-Setup.${ext}
+  oneClick: false
+  perMachine: false
+  allowElevation: false
+  allowToChangeInstallationDirectory: false
+  installerLanguages: [tr_TR, en_US]
+  language: '1055'
+  displayLanguageSelector: false
+  shortcutName: Open-LLM-VTuber TR
+  uninstallDisplayName: Open-LLM-VTuber TR
   createDesktopShortcut: always
+  createStartMenuShortcut: true
+  deleteAppDataOnUninstall: false
   differentialPackage: false
-mac:
-  icon: resources/icon.icns
-  target:
-    - target: dmg
-      arch: [x64, arm64]
-  entitlementsInherit: build/entitlements.mac.plist
-  extendInfo:
-    - NSCameraUsageDescription: Application requests access to the device's camera.
-    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
-    - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
-    - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
-  notarize: false
-dmg:
-  artifactName: ${name}-${version}.${ext}
-  writeUpdateInfo: false
-linux:
-  target:
-    - AppImage
-    - snap
-    - deb
-  maintainer: electronjs.org
-  category: Utility
-appImage:
-  artifactName: ${name}-${version}.${ext}
+  license: resources/installer-license.txt
+  runAfterFinish: true
 npmRebuild: false
-publish:
-  provider: github
-  releaseType: release
-  publishAutoUpdate: false
-electronDownload:
-  mirror: https://npmmirror.com/mirrors/electron/
+publish: null
