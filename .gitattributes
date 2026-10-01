@@ -5,3 +5,5 @@
 *.js text eol=lf
 *.cjs text eol=lf
 *.json text eol=lf
+# Preserve the original bytes of this upstream third-party bundle.
+src/renderer/public/libs/live2d.min.js -text
