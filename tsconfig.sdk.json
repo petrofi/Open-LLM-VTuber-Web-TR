@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "skipLibCheck": true,
+    "strict": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": ".types/sdk",
+    "rootDir": "src/renderer/WebSDK",
+    "baseUrl": ".",
+    "paths": {
+      "@framework/*": [
+        "src/renderer/WebSDK/Framework/src/*"
+      ],
+      "@cubismsdksamples/*": [
+        "src/renderer/WebSDK/src/*"
+      ]
+    }
+  },
+  "include": [
+    "src/renderer/WebSDK/**/*.ts"
+  ]
+}

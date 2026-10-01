@@ -40,7 +40,7 @@ export default defineConfig({
             dest: './libs/',
           },
           {
-            src: normalizePath(resolve(__dirname, 'node_modules/onnxruntime-web/dist/*.wasm')),
+            src: normalizePath(resolve(__dirname, 'node_modules/onnxruntime-web/dist/*.{wasm,mjs}')),
             dest: './libs/',
           },
           {

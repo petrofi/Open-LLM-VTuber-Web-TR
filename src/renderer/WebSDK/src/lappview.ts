@@ -93,10 +93,11 @@ export class LAppView {
     // this._gear.release();
     // this._gear = null;
 
-    this._back.release();
+    // TR: the optional background sprite may never have been created.
+    this._back?.release();
     this._back = null;
 
-    gl.deleteProgram(this._programId);
+    gl?.deleteProgram(this._programId);
     this._programId = null;
   }
 

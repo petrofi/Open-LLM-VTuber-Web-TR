@@ -59,3 +59,13 @@ out
 
 # Cursor files
 .cursorrules
+# TR private staging and verification
+.runtime/
+.types/
+.qa/
+*-result.txt
+*-audit.json
+*.pem
+*.key
+*.pfx
+.env.*

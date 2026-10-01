@@ -7,7 +7,7 @@
  * that can be found at https://www.live2d.com/eula/live2d-open-software-license-agreement_en.html.
  */
 
-import { LAppDelegate } from "./lappdelegate";
+import { LAppDelegate, s_instance } from "./lappdelegate";
 import * as LAppDefine from "./lappdefine";
 import { LAppGlManager } from "./lappglmanager";
 import { LAppLive2DManager } from "./lapplive2dmanager";
@@ -109,8 +109,9 @@ window.addEventListener(
 window.addEventListener(
   "resize",
   () => {
-    if (LAppDefine.CanvasSize === "auto") {
-      LAppDelegate.getInstance().onResize();
+    // TR: the first-run wizard can resize before Live2D is initialized.
+    if (LAppDefine.CanvasSize === "auto" && s_instance) {
+      s_instance.onResize();
     }
   },
   { passive: true }

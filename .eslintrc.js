@@ -15,6 +15,9 @@ module.exports = {
     },
   },
   rules: {
+    'no-use-before-define': ['error', { functions: false, variables: false }],
+    'no-param-reassign': ['error', { props: false }],
+    'jsx-a11y/label-has-associated-control': ['error', { assert: 'nesting', depth: 3 }],
     'no-unused-vars': 'off',
     'max-len': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
