@@ -5,7 +5,7 @@ const path = require('node:path');
 const assert = require('node:assert/strict');
 
 (async () => {
-  const output = path.resolve('.qa');
+  const output = path.resolve(process.env.TR_QA_OUTPUT || '.qa');
   await fs.mkdir(output, { recursive: true });
   if (!process.env.TR_INSTALLED_EXE) {
     const settingsFile = path.join(output, 'user-data/settings.json');
@@ -32,13 +32,16 @@ const assert = require('node:assert/strict');
     stateFile = path.join(userData, 'runtime-state.json');
     const capture = async (name) => { const png = await application.evaluate(async ({BrowserWindow}) => (await BrowserWindow.getAllWindows()[0].webContents.capturePage()).toPNG().toString('base64')); await fs.writeFile(path.join(output,name),Buffer.from(png,'base64')); };
     pids.add(JSON.parse(await fs.readFile(stateFile, 'utf8')).pid);
-    for (const [width, height, zoom] of [[1366,768,1],[1366,768,1.25],[1920,1080,1],[1920,1080,1.25]]) {
-      await application.evaluate(({ BrowserWindow }, size) => { const win = BrowserWindow.getAllWindows()[0]; win.setSize(size[0], size[1]); win.webContents.setZoomFactor(size[2]); }, [width,height,zoom]);
-      await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
-      await capture(`welcome-${width}-${zoom}.png`);
-      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
-    }
-    await application.evaluate(({ BrowserWindow }) => { const win = BrowserWindow.getAllWindows()[0]; win.setSize(1366,768); win.webContents.setZoomFactor(1); });
+    const captureSizes = async (screen) => {
+      for (const [width, height, zoom] of [[1366,768,1],[1366,768,1.25],[1920,1080,1],[1920,1080,1.25]]) {
+        await application.evaluate(({ BrowserWindow }, size) => { const win = BrowserWindow.getAllWindows()[0]; win.setSize(size[0], size[1]); win.webContents.setZoomFactor(size[2]); }, [width,height,zoom]);
+        await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+        await capture(`${screen}-${width}-${zoom}.png`);
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+      }
+      await application.evaluate(({ BrowserWindow }) => { const win = BrowserWindow.getAllWindows()[0]; win.setSize(1366,768); win.webContents.setZoomFactor(1); });
+    };
+    await captureSizes('welcome');
     await page.getByRole('button', { name: 'Başlayalım', exact: true }).click();
     report.hardware = await page.evaluate(() => window.electron.ipcRenderer.invoke('tr:hardware'));
     await page.getByRole('button', { name: 'Devam', exact: true }).click();
@@ -52,6 +55,7 @@ const assert = require('node:assert/strict');
       stream.getTracks().forEach(track => track.stop()); return result;
     });
     await capture('microphone.png');
+    await captureSizes('microphone');
     await page.getByRole('button', { name: 'Devam', exact: true }).click();
     await page.getByRole('button', { name: 'Test Sesi Çal', exact: true }).click();
     await page.getByRole('button', { name: 'Devam', exact: true }).click();
@@ -59,9 +63,11 @@ const assert = require('node:assert/strict');
     if (process.env.TR_ASR_TEST === '1') {
       if (!report.asr.ready) {
         await page.getByRole('button', {name:'Türkçe Konuşma Modelini İndir',exact:true}).click();
-        const deadline=Date.now()+1200000;
+        const deadline=Date.now()+2700000;
+        let previousMessage='';
         do {
           report.asr=await page.evaluate(() => window.electron.ipcRenderer.invoke('tr:request','/tr/asr/status'));
+          if(report.asr.message!==previousMessage) { console.log(report.asr.message); previousMessage=report.asr.message; }
           if(report.asr.state==='error') throw new Error(report.asr.message);
           if(report.asr.ready) break;
           await new Promise(resolve=>setTimeout(resolve,2000));
@@ -82,6 +88,7 @@ const assert = require('node:assert/strict');
     await page.getByRole('button', { name: 'Devam', exact: true }).click();
     report.providers = await page.evaluate(() => window.electron.ipcRenderer.invoke('tr:request', '/tr/providers'));
     await capture('llm.png');
+    await captureSizes('llm');
     await page.getByRole('button', { name: 'Devam', exact: true }).click();
     report.ttsPlayback = await page.evaluate(async () => {
       const result = await window.electron.ipcRenderer.invoke('tr:request', '/tr/tts/test', 'POST');
@@ -125,6 +132,7 @@ const assert = require('node:assert/strict');
     await page.getByRole('button', {name:'Mikrofonu Aç / Kapat',exact:true}).click();
     assert.deepEqual(report.failedRequests, []);
     await capture('character.png');
+    await captureSizes('character');
     assert.deepEqual(report.errors, []);
   } finally {
     if (stateFile) pids.add(JSON.parse(await fs.readFile(stateFile, 'utf8')).pid);
